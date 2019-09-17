@@ -14,7 +14,7 @@ def get_ls_line(x, y):
     b = ((sum_y-m*sum_x)/pts_len)
     return m, b
 
-def get_fit_quality(y, fit_y, y_acc):
+def get_fit_quality_chi_sq(y, fit_y, y_acc):
     """This returns the chi-squared value for the data & fit line"""
     y_diff = [ypt - fitpt for ypt, fitpt in zip(y, fit_y)]
     print(np.array(y_diff)**2)
@@ -37,9 +37,16 @@ plot.ylabel("Current Measured [mA]")
 plot.figure()
 
 #%% Fit Quality for Option 1
-q = get_fit_quality(plot_data[:,2], ls_fit, plot_data[:,3])
+q = get_fit_quality_chi_sq(plot_data[:,2], ls_fit, plot_data[:,3])
 N = 2 # Always 2 for linear fit, really DOF
-print("chi-squared: {}; DOF: {};".format(q, N))
+print("reduced chi-squared: {}; chi-squared: {}; DOF: {};".format(q/N, q, N))
+# Get uncertainty
+pts_len = len(plot_data[:,0])
+delta = pts_len*sum([x**2 for x in plot_data[:,0]]) - sum([x for x in plot_data[:,0]])**2
+s_yxsq = (1/(pts_len - 2))*sum([(ypt - yest)**2 for ypt, yest in zip(plot_data[:,3], ls_fit)])
+s_m = np.sqrt(pts_len*(s_yxsq/delta))
+s_b = np.sqrt((s_yxsq*sum([x**2 for x in plot_data[:,0]]))/delta)
+print("slope error: {}; intercept error: {};".format(s_m, s_b))
 
 #%% Get Data for Option 2
 data_2 = read_csv('lab_0~Exercise/src2.txt')
@@ -59,6 +66,13 @@ plot.figure()
 
 
 #%% Fit Quality for Option 2
-q = get_fit_quality(plot_data[:,2], ls_fit, plot_data[:,3])
+q = get_fit_quality_chi_sq(plot_data[:,2], ls_fit, plot_data[:,3])
 N = 2 # Always 2 for linear fit, really DOF
-print("chi-squared: {}; DOF: {};".format(q, N))
+print("reduced chi-squared: {}; chi-squared: {}; DOF: {};".format(q/N, q, N))
+# Get uncertainty
+pts_len = len(plot_data[:,0])
+delta = pts_len*sum([x**2 for x in plot_data[:,0]]) - sum([x for x in plot_data[:,0]])**2
+s_yxsq = (1/(pts_len - 2))*sum([(ypt - yest)**2 for ypt, yest in zip(plot_data[:,3], ls_fit)])
+s_m = np.sqrt(pts_len*(s_yxsq/delta))
+s_b = np.sqrt((s_yxsq*sum([x**2 for x in plot_data[:,0]]))/delta)
+print("slope error: {}; intercept error: {};".format(s_m, s_b))
