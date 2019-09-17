@@ -52,6 +52,18 @@ print("slope error: {}; intercept error: {};".format(s_m, s_b))
 data_2 = read_csv('lab_0~Exercise/src2.txt')
 plot_data = np.array(data_2)
 
+#%% Run Rv Calcs for Option 2
+r_vals = [1.2e6, 34e3, 845, 327]
+r_err = [1e5, 1e2, 1, 1]
+r_v = [v/(i - v/r) for v, i, r in zip(plot_data[:,0], plot_data[:,2], r_vals)]
+r_v_err = []
+for r_v_pt, v, verr, i, ierr, r, rerr in zip(r_v, plot_data[:,0], plot_data[:,1], plot_data[:,2], plot_data[:,3], r_vals, r_err):
+    v_over_r_err = (v/r)*np.sqrt((verr/v)**2 + (rerr/r)**2)
+    i_a_diff_err = np.sqrt(ierr**2 + v_over_r_err**2)
+    r_v_err += [r_v_pt*np.sqrt((verr/v)**2 + ((i - v/r)/i_a_diff_err)**2)]
+print(r_v)
+print(r_v_err)
+
 #%% Data Fitting for Option 2
 m, b = get_ls_line(plot_data[:,0], plot_data[:,2])
 ls_fit = [b + m * x for x in plot_data[:,0]]
