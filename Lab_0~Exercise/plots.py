@@ -30,10 +30,10 @@ ls_fit = [b + m * x for x in plot_data[:,0]]
 
 #%% Plotting Option 1
 plot.errorbar(plot_data[:,0], plot_data[:,2], plot_data[:,1], plot_data[:,3], 'ro')
-plot.title("Option 1 - V vs. I")
+plot.title("Option 1 - I vs. V")
 plot.plot(plot_data[:,0], ls_fit)
-plot.xlabel("Voltage Measured [V]")
-plot.ylabel("Current Measured [mA]")
+plot.xlabel("Current Measured [mA]")
+plot.ylabel("Voltage Measured [V]")
 plot.figure()
 
 #%% Fit Quality for Option 1
@@ -46,6 +46,7 @@ delta = pts_len*sum([x**2 for x in plot_data[:,0]]) - sum([x for x in plot_data[
 s_yxsq = (1/(pts_len - 2))*sum([(ypt - yest)**2 for ypt, yest in zip(plot_data[:,3], ls_fit)])
 s_m = np.sqrt(pts_len*(s_yxsq/delta))
 s_b = np.sqrt((s_yxsq*sum([x**2 for x in plot_data[:,0]]))/delta)
+print("slope: {}; intercept: {};".format(m, b))
 print("slope error: {}; intercept error: {};".format(s_m, s_b))
 
 #%% Get Data for Option 2
@@ -55,14 +56,14 @@ plot_data = np.array(data_2)
 #%% Run Rv Calcs for Option 2
 r_vals = [1.2e6, 34e3, 845, 327]
 r_err = [1e5, 1e2, 1, 1]
-r_v = [v/(i - v/r) for v, i, r in zip(plot_data[:,0], plot_data[:,2], r_vals)]
+r_v = [v/(i - v/r) for v, i, r in zip(plot_data[:,2], plot_data[:,0], r_vals)]
 r_v_err = []
-for r_v_pt, v, verr, i, ierr, r, rerr in zip(r_v, plot_data[:,0], plot_data[:,1], plot_data[:,2], plot_data[:,3], r_vals, r_err):
-    v_over_r_err = (v/r)*np.sqrt((verr/v)**2 + (rerr/r)**2)
+for r_v_pt, v, verr, i, ierr, r, rerr in zip(r_v, plot_data[:,2], plot_data[:,3], plot_data[:,0], plot_data[:,1], r_vals, r_err):
+    v_over_r_err = np.sqrt((verr/v)**2 + (rerr/r)**2)
     i_a_diff_err = np.sqrt(ierr**2 + v_over_r_err**2)
-    r_v_err += [r_v_pt*np.sqrt((verr/v)**2 + ((i - v/r)/i_a_diff_err)**2)]
-print(r_v)
-print(r_v_err)
+    r_v_err += [np.sqrt((verr/v)**2 + (i_a_diff_err/(i - v/r))**2)]
+for r_v_pt, rv_err in zip(r_v, r_v_err):
+    print("R_v: {}; Error: {};".format(r_v_pt, rv_err))
 
 #%% Data Fitting for Option 2
 m, b = get_ls_line(plot_data[:,0], plot_data[:,2])
@@ -70,12 +71,11 @@ ls_fit = [b + m * x for x in plot_data[:,0]]
 
 #%% Plotting Option 2
 plot.errorbar(plot_data[:,0], plot_data[:,2], plot_data[:,1], plot_data[:,3], 'ro')
-plot.title("Option 2 - V vs. I")
-plot.xlabel("Voltage Measured [V]")
-plot.ylabel("Current Measured [mA]")
+plot.title("Option 2 - I vs. V")
+plot.xlabel("Current Measured [mA]")
+plot.ylabel("Voltage Measured [V]")
 plot.plot(plot_data[:,0], ls_fit)
 plot.figure()
-
 
 #%% Fit Quality for Option 2
 q = get_fit_quality_chi_sq(plot_data[:,2], ls_fit, plot_data[:,3])
@@ -87,4 +87,5 @@ delta = pts_len*sum([x**2 for x in plot_data[:,0]]) - sum([x for x in plot_data[
 s_yxsq = (1/(pts_len - 2))*sum([(ypt - yest)**2 for ypt, yest in zip(plot_data[:,3], ls_fit)])
 s_m = np.sqrt(pts_len*(s_yxsq/delta))
 s_b = np.sqrt((s_yxsq*sum([x**2 for x in plot_data[:,0]]))/delta)
+print("slope: {}; intercept: {};".format(m, b))
 print("slope error: {}; intercept error: {};".format(s_m, s_b))
