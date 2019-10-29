@@ -16,7 +16,7 @@ def get_ls_line(x, y):
 
 def get_fit_quality_chi_sq(y, fit_y, y_acc):
     """This returns the chi-squared value for the data & fit line"""
-    y_diff = [ypt - fitpt for ypt, fitpt in zip(y, fit_y)]
+    # y_diff = [ypt - fitpt for ypt, fitpt in zip(y, fit_y)]
     return sum([(ypt - fitpt)**2/acc**2 for ypt, fitpt, acc in zip(y, fit_y, y_acc)])
 
 #%% Get Data
@@ -31,10 +31,10 @@ ls_fit = [b + m * x for x in plot_data[:,2]]
 plot.style.use('ggplot')
 plot.errorbar(plot_data[:,2], plot_data[:,0], yerr=[0.001]*len(plot_data[:,2]), 
                                             xerr=[0.1]*len(plot_data[:,0]), fmt='ro')
-plot.title("Wavelength of Ultrasonic Waves at Different Frequencies", color='k')
+plot.title("The Diameter of Orbit of an Electron at Different Currents Under 150V", color='k')
 plot.plot(plot_data[:,2], ls_fit)
-plot.xlabel("1 / Frequency [1s x $10^{-6}$]")
-plot.ylabel("Wavelength [m]")
+plot.xlabel("Diameter [cm]")
+plot.ylabel("Current [A]")
 fig = plot.gcf()
 plot.figure()
 
@@ -60,8 +60,8 @@ plot.errorbar(plot_data[:,2], np.array(plot_data[:,0]) - np.array(ls_fit), yerr=
                                             xerr=[0.1]*len(plot_data[:,2]), fmt='ro')
 plot.title("Residuals of Ultrasonic Waves at Different Frequencies", color='k')
 plot.plot(plot_data[:,2], [0]*len(plot_data[:,2]))
-plot.xlabel("1 / Frequency [1s x $10^{-6}$]")
-plot.ylabel("Standardized Residuals for Wavelength [m]")
+plot.xlabel("Diameter [cm]")
+plot.ylabel("Standardized Residuals for Current [A]")
 fig = plot.gcf()
 plot.figure()
 
